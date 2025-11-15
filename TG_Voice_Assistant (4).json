@@ -1,0 +1,1145 @@
+{
+  "name": "TG Voice Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{$json.message.voice.file_id}}"
+      },
+      "id": "cd5f3439-7d25-4a3d-9e6e-b5a53c48e04a",
+      "name": "Download voice file",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        700,
+        260
+      ],
+      "typeVersion": 1.2,
+      "webhookId": "3f5044d2-66da-4bf0-8d0f-a65fc1022cb8",
+      "credentials": {
+        "telegramApi": {
+          "id": "TcbObD6DMhrQ5vJy",
+          "name": "outreach_viral_post_saver_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Handle user messaage with AI agent",
+        "height": 571,
+        "width": 841,
+        "color": 4
+      },
+      "id": "ff44b8d8-5d53-4725-8106-324c613fe254",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1060,
+        360
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $('Listen for incoming events').first().json.message.from.id }}"
+      },
+      "id": "4f47488f-a2f9-41dc-886e-70e5c6c16bd1",
+      "name": "Send Typing action",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        660,
+        -60
+      ],
+      "typeVersion": 1.2,
+      "webhookId": "ea6c18d7-349c-43ca-a83e-e4b522a292cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "TcbObD6DMhrQ5vJy",
+          "name": "outreach_viral_post_saver_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1620,
+        20
+      ],
+      "id": "c5262dd5-0c27-4131-806d-220e92b2445b",
+      "name": "Wait",
+      "webhookId": "ad482cce-b729-4b00-8f98-92552970efaf"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.assemblyai.com/v2/transcript",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "15a5eedacb1943bda2be567421cf0f54"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "audio_url",
+              "value": "={{ $json.upload_url }}"
+            },
+            {
+              "name": "speech_model",
+              "value": "universal"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        20
+      ],
+      "id": "e6864a5a-2890-4f62-934b-6b53306abced",
+      "name": "Transcribe"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.assemblyai.com/v2/transcript/{{ $('Transcribe').item.json.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "15a5eedacb1943bda2be567421cf0f54"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1780,
+        20
+      ],
+      "id": "537fc1fa-d6ab-4d19-b951-3ed7119c09de",
+      "name": "Get transcribed text"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Listen for incoming events').first().json.message.from.id }}",
+        "text": "=Hi, {{ $('Listen for incoming events').first().json.message.from.first_name }}! I am your assistant and will help you to create Notion tasks and Google Calendar events by your voice commands. Texts are not processed.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "939795c4-e533-4352-8b21-94d5c3ee7835",
+      "name": "start",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        860,
+        -60
+      ],
+      "typeVersion": 1.2,
+      "webhookId": "f6bf2ba3-745c-4310-8ae4-7f01b652f9fa",
+      "credentials": {
+        "telegramApi": {
+          "id": "TcbObD6DMhrQ5vJy",
+          "name": "outreach_viral_post_saver_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Listen for incoming events').first().json.message.from.id }}",
+        "text": "=Please send only voice messages.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "c253c150-ba4b-4ec6-b693-8918e6abbe0d",
+      "name": "Handle text",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        860,
+        100
+      ],
+      "typeVersion": 1.2,
+      "webhookId": "f6bf2ba3-745c-4310-8ae4-7f01b652f9fa",
+      "credentials": {
+        "telegramApi": {
+          "id": "TcbObD6DMhrQ5vJy",
+          "name": "outreach_viral_post_saver_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionKey": "=session_{{ $('Listen for incoming events').first().json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "id": "f3fc1811-3962-4a4f-baae-5f730f413087",
+      "name": "Window Buffer Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1240,
+        440
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Tools",
+        "height": 320,
+        "width": 740
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        280,
+        600
+      ],
+      "id": "b59cdaf3-6d6c-4d67-bfb4-ab12b4f590c9",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "9a1010328501945127d76a5bdb58d6f8f381f90dfcb8a72d979de4816261fe4a@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Tasks_"
+        },
+        "start": "={{ $fromAI('Start') }}",
+        "end": "={{ $fromAI('End') }}",
+        "additionalFields": {
+          "attendees": [],
+          "description": "={{ $fromAI('Description') }}",
+          "summary": "={{ $fromAI('EventTitle') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        300,
+        660
+      ],
+      "id": "5d56f09f-cbcc-4e14-97de-1db86f14577f",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "IkSXJ2mnc0TCaQo1",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "9a1010328501945127d76a5bdb58d6f8f381f90dfcb8a72d979de4816261fe4a@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Tasks_"
+        },
+        "timeMax": "={{ $now.plus({ week: 4 }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        660
+      ],
+      "id": "8513e902-3328-4a22-b28b-239d78220812",
+      "name": "Get events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "IkSXJ2mnc0TCaQo1",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "9a1010328501945127d76a5bdb58d6f8f381f90dfcb8a72d979de4816261fe4a@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Tasks_"
+        },
+        "eventId": "={{ $fromAI('Event_ID') }}",
+        "updateFields": {
+          "description": "={{ $fromAI('Description', ``, 'string') }}",
+          "end": "={{ $fromAI('End') }}",
+          "location": "={{ $fromAI('Location', ``, 'string') }}",
+          "start": "={{ $fromAI('Start') }}",
+          "summary": "={{ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        680,
+        660
+      ],
+      "id": "bac6bb14-6afd-4dc2-82e4-fd5ece42c0ca",
+      "name": "Update an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "IkSXJ2mnc0TCaQo1",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "229d75b2-08a7-813d-b47a-c5dcb3997477",
+          "mode": "list",
+          "cachedResultName": "Tasks",
+          "cachedResultUrl": "https://www.notion.so/229d75b208a7813db47ac5dcb3997477"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Due|date",
+              "includeTime": false,
+              "date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('propertyValues0_Date', ``, 'string') }}",
+              "timezone": "Asia/Almaty"
+            },
+            {
+              "key": "Name|title",
+              "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('propertyValues1_Title', ``, 'string') }}"
+            },
+            {
+              "key": "Priority|select",
+              "selectValue": "={{ $fromAI('Priority') }}"
+            },
+            {
+              "key": "Status|status",
+              "statusValue": "={{ $fromAI('Status') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        660
+      ],
+      "id": "be6ce581-d275-4b8f-9363-13847f02d4e2",
+      "name": "Create notion task",
+      "credentials": {
+        "notionApi": {
+          "id": "prnX5MLXB9sCyT6Y",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "b974d267-7148-4df9-a333-851679782aad",
+      "name": "Listen for incoming events",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [
+        340,
+        260
+      ],
+      "webhookId": "322dce18-f93e-4f86-b9b1-3305519b7834",
+      "typeVersion": 1,
+      "credentials": {
+        "telegramApi": {
+          "id": "TcbObD6DMhrQ5vJy",
+          "name": "outreach_viral_post_saver_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text != \"\" ? $json.text : \"user message is empty\" }}",
+        "options": {
+          "systemMessage": "=You are an intelligent voice assistant. Your primary goal is to help users create tasks in Notion and events in Google Calendar based on their voice commands, with minimal follow-up questions.\n\n## Core Task: Intent & Tool Selection\nFirst, parse the user's command to identify if it's a request to create a Notion task or to create/update a Google Calendar event. Then, use the appropriate tool.\n\nIf user message is empty, then immediately response telling that user did not provide a message.\n\nUser Intent Parsing:\nParse the user's message to extract the date and time reference.\nHandle specific terms like \"morning,\" \"afternoon,\" \"evening,\" \"today,\" \"tomorrow,\" and relative time expressions (e.g., \"next Monday,\" \"next week\").\n- For relative terms like \"next week,\" calculate the exact date (e.g., next Monday).\n- If no time is specified, apply a default (e.g., 9 AM for \"morning,\" 3 PM for \"afternoon\", 9 PM for 'evening' etc).\n\n### ### Notion Task Creation Rules\nWhen the user wants to create a Notion task, you must be autonomous. Do not ask for clarification on Status, Priority, or Title. Instead, follow these rules:\n\n1.  **Title Generation:** You MUST define the task title yourself based on the user's request. Create a concise, clear title that summarizes the user's command.\n    * *Example User Input:* \"I need to remember to prepare the slides for the quarterly review meeting.\"\n    * *Correct Title:* \"Prepare slides for quarterly review\"\n\n2.  **Status Assignment:** If the user does not explicitly specify a status, you MUST set the 'Status' property to 'Backlog'.\n\n3.  **Priority Determination:** You MUST logically determine the task's 'Priority' from the available options ('Low', 'Medium', 'High').\n    * Use keywords to help you decide. If the user says 'urgent', 'ASAP', or 'immediately', set the priority to **'High'**.\n    * If the user provides a near-term deadline (e.g., 'by tomorrow', 'this week'), consider **'Medium'** or **'High'**.\n    * For general reminders or tasks with distant deadlines (e.g., 'next month'), consider **'Low'**.\n    * If you cannot logically determine a priority from the context, **default to 'Medium'**.\n\nExample Time Handling:\n\"Today's morning\" → 9 AM on the current day.\n\"Tomorrow's evening\" → 6 PM on the next day.\n\"Next week\" → Calculate the exact date for next week's day (e.g., next Monday).\n\"Next Monday\" → Automatically compute the next Monday's date.\n\nUser requests to create a Google Calendar event or Notion task. First, parse the command to identify if it's a request to create an event, task, or update an event. If it's an event creation, use the 'create an event' tool. If it's a task creation, use the 'create notion task' tool. If it's an event update, use 'get events' to fetch the event ID. Get events will return all the events from current time to month later period. You should pick a event which user has said without asking extra specifying questions. Then use 'update an event' to modify it using event ID that you got from 'get events' tool.\n\nCurrent datetime is: {{ $now }}\n\nImportant: always confirm with the user what you have done. ALWAYS DOUBLE CHECK TOOL OUTPUTS BEFORE CONFIRMING THE TASK COMPLETION. It should not be so that you confirm the event creation but actually calendar is still does not have a task that user asked to create.\n\n[Sample AI-Agent Interaction]:\nScenario 1: User Wants to Create an Event for \"Today’s Morning\"\nUser: \"Create an event for today's morning, meeting with the team.\"\nAgent: \"I’ll set the time for 9 AM for today’s morning. Is that okay?\"\nIf the user confirms: \"Great! I’ve scheduled your meeting with the team for 9 AM today.\"\n\nScenario 2: User Wants to Create an Event for \"Tomorrow’s Evening\"\nUser: \"Schedule an event for tomorrow's evening, dinner with friends.\"\nAgent: \"I’ll set the time for 6 PM tomorrow. Does that sound good?\"\nIf the user confirms: \"Perfect! Your dinner with friends is scheduled for 6 PM tomorrow.\"\n\nScenario 3: User Wants to Create a Task Without a Deadline\nUser: \"Create a task in Notion, finish the report.\"\nAgent: \"When would you like the task to be due? If unsure, I can set the due date for next Friday.\"\nIf the user agrees: \"Got it! The task 'finish the report' is due next Friday.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        620
+      ],
+      "id": "66c44bc1-0648-41a9-871d-6bf8659dcd54",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "# Get message\n",
+        "height": 628,
+        "width": 735,
+        "color": 5
+      },
+      "id": "12b864fc-b3c0-488b-b96f-890c69c99a42",
+      "name": "Get message",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        280,
+        -60
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "dd41bbf0-bee0-450b-9160-b769821a4abc",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.message.voice}}",
+                    "rightValue": ""
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Other"
+        }
+      },
+      "id": "8ab21871-a857-4923-a290-a7acad948765",
+      "name": "Msg type",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        520,
+        260
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Listen for incoming events').first().json.message.from.id }}",
+        "text": "={{ $json.error }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "7c2127f0-f3ce-471d-aa95-86dcdbee3881",
+      "name": "Error reply",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1500,
+        720
+      ],
+      "typeVersion": 1.1,
+      "webhookId": "1df38f99-e79a-477b-b882-393de9bdcd00",
+      "credentials": {
+        "telegramApi": {
+          "id": "TcbObD6DMhrQ5vJy",
+          "name": "outreach_viral_post_saver_bot"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Listen for incoming events').first().json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "25347660-d53d-43ce-9f23-b1b2662b1b04",
+      "name": "Done",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1500,
+        560
+      ],
+      "typeVersion": 1.1,
+      "webhookId": "1df38f99-e79a-477b-b882-393de9bdcd00",
+      "credentials": {
+        "telegramApi": {
+          "id": "TcbObD6DMhrQ5vJy",
+          "name": "outreach_viral_post_saver_bot"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.assemblyai.com/v2/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "15a5eedacb1943bda2be567421cf0f54"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        260
+      ],
+      "id": "d0d3d694-09a0-4b38-afaf-26b7b0235ff8",
+      "name": "Upload file",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Listen for incoming events').first().json.message.from.id }}",
+        "text": "=Sorry, {{ $('Listen for incoming events').first().json.message.from.first_name }}! This command is not supported yet. Please send voice messages.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "bf0c382a-2c13-4479-8904-d86d9de13b98",
+      "name": "Error msg",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        700,
+        420
+      ],
+      "typeVersion": 1.2,
+      "webhookId": "f6bf2ba3-745c-4310-8ae4-7f01b652f9fa",
+      "credentials": {
+        "telegramApi": {
+          "id": "TcbObD6DMhrQ5vJy",
+          "name": "outreach_viral_post_saver_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3b8a6c3a-326d-4edc-9f47-7f3f701ba63b",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        700,
+        100
+      ],
+      "id": "e1c61057-e5a1-4c98-b8a0-483d66c7de22",
+      "name": "If start command"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e5dc05ec-c234-48b1-9911-eb43a58de535",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        200
+      ],
+      "id": "879c174e-be5d-4297-95e1-db6f72ad54ae",
+      "name": "Check status"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "894892b8-97a8-4a6f-875b-a655a3f4b059",
+              "leftValue": null,
+              "rightValue": 5,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1620,
+        200
+      ],
+      "id": "8fe9a919-f486-4286-8e9a-ebc0392643f5",
+      "name": "Infinite?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "50fd0372-ccd0-4173-918a-54397b474750",
+              "name": "counter",
+              "value": "={{ $('set counter').item.json.counter + 1 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1460,
+        200
+      ],
+      "id": "657b632b-7d05-4f81-82b5-b4c501aa5fd9",
+      "name": "counter++"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e0a08590-69ca-4230-abe8-db6595313177",
+              "name": "counter",
+              "value": 0,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        20
+      ],
+      "id": "cd48af43-2074-4123-954a-de1bb76f5127",
+      "name": "init counter"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28233796-ddb8-4bff-be51-088088ef22dd",
+              "name": "counter",
+              "value": "={{ $json.counter }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1460,
+        20
+      ],
+      "id": "8c95bb94-5007-4523-94a7-d60dafc60c27",
+      "name": "set counter"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Listen for incoming events').first().json.message.from.id }}",
+        "text": "=Please send only voice messages.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "ad6e33e0-009c-4adb-93a6-48450bcfba28",
+      "name": "Error msg1",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1780,
+        200
+      ],
+      "typeVersion": 1.2,
+      "webhookId": "f6bf2ba3-745c-4310-8ae4-7f01b652f9fa",
+      "credentials": {
+        "telegramApi": {
+          "id": "TcbObD6DMhrQ5vJy",
+          "name": "outreach_viral_post_saver_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Transcribe",
+        "height": 391,
+        "width": 841
+      },
+      "id": "3ac641e5-686a-467a-9659-d9b6819041fd",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1060,
+        -60
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        440
+      ],
+      "id": "a59f1846-cdd2-489a-8a7b-8f436c1c8984",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "14UgKZm8xCFm1UXG",
+          "name": "GGemini johnsmits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Listen for incoming events').first().json.message.from.id }}",
+        "text": "=Sorry, {{ $('Listen for incoming events').first().json.message.from.first_name }}! Could not process your voice message. Make sure that you have provided a meaningful message.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "f8083678-629d-42b7-9898-c5343950e0d6",
+      "name": "Error msg2",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1120,
+        180
+      ],
+      "typeVersion": 1.2,
+      "webhookId": "f6bf2ba3-745c-4310-8ae4-7f01b652f9fa",
+      "credentials": {
+        "telegramApi": {
+          "id": "TcbObD6DMhrQ5vJy",
+          "name": "outreach_viral_post_saver_bot"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Download voice file": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get transcribed text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe": {
+      "main": [
+        [
+          {
+            "node": "init counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get transcribed text": {
+      "main": [
+        [
+          {
+            "node": "Check status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get events": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update an event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create notion task": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listen for incoming events": {
+      "main": [
+        [
+          {
+            "node": "Send Typing action",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Msg type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Msg type": {
+      "main": [
+        [
+          {
+            "node": "If start command",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download voice file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error msg2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If start command": {
+      "main": [
+        [
+          {
+            "node": "start",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check status": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "counter++",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Infinite?": {
+      "main": [
+        [
+          {
+            "node": "Error msg1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "set counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "counter++": {
+      "main": [
+        [
+          {
+            "node": "Infinite?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "init counter": {
+      "main": [
+        [
+          {
+            "node": "set counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set counter": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "start": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7e0dc3af-8f9c-4e38-ae83-cf5f3a79eb68",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "77e2ae7ffb7358a6841d11dd3001cabe0e331b33045c10209be4811ffb60a1b2"
+  },
+  "id": "uzcj2xcfxdrspLuO",
+  "tags": []
+}
